@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>058B4FCF-E3E8-4DB2-BD53-FFD90D4EBC90</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Virtual Tourist</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>D0D5B8C0F045BDC119F772F14D2A731912B057A2</key>
+		<string>https://github.com/Mo-chan/Virtual-Tourist.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Virtual Tourist.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>D0D5B8C0F045BDC119F772F14D2A731912B057A2</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/Mo-chan/Virtual-Tourist.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>D0D5B8C0F045BDC119F772F14D2A731912B057A2</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D0D5B8C0F045BDC119F772F14D2A731912B057A2</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Virtual%20Tourist</string>
+		</dict>
+	</array>
+</dict>
+</plist>
