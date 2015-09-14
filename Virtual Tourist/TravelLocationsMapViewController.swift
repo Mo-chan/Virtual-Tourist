@@ -25,7 +25,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
         fetchedResultsController.delegate = self
         
         pressRecognizer = UILongPressGestureRecognizer(target: self, action: "addPinToMap:")
-        pressRecognizer?.numberOfTapsRequired = 1
 
         println(NSUserDefaults.standardUserDefaults().doubleForKey("latitude"))
         let lat = NSUserDefaults.standardUserDefaults().doubleForKey("latitude")
@@ -167,8 +166,8 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
                         for photo in Photos {
                         
                             let dictionary: [String : AnyObject] = [
-                                Photo.Keys.Id : photo["id"]!,
-                                Photo.Keys.Path : photo["url_m"]! ,
+                                Photo.Keys.Id : photo[Flickr.Constants.ID]!,
+                                Photo.Keys.Path : photo[Flickr.Constants.URL]! ,
                             ]
                             
                             let pic = Photo(dictionary: dictionary, context: self.sharedContext)

@@ -51,10 +51,10 @@ class imageCache {
         
         // Otherwise, keep the image in memory
         inMemoryCache.setObject(image!, forKey: path)
-        
+        NSKeyedArchiver.archiveRootObject(image!, toFile: path)
         // And in documents directory
-        let data = UIImagePNGRepresentation(image!)
-        data.writeToFile(path, atomically: true)
+        //let data = UIImagePNGRepresentation(image!)
+        //data.writeToFile(path, atomically: true)
     }
     
     

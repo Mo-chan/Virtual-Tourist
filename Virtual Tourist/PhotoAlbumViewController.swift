@@ -88,6 +88,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     {
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         sharedContext.deleteObject(photo)
+        photo.pinImage = nil
         CoreDataStackManager.sharedInstance().saveContext()
         
     }
@@ -100,6 +101,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
             println(photos.count)
             for photo in photos {
                 self.sharedContext.deleteObject(photo)
+                photo.pinImage = nil
                 CoreDataStackManager.sharedInstance().saveContext()
             }
         }
@@ -110,8 +112,8 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                     for photo in Photos {
                         
                         let dictionary: [String : AnyObject] = [
-                            Photo.Keys.Id : photo["id"]!,
-                            Photo.Keys.Path : photo["url_m"]! ,
+                            Photo.Keys.Id : photo[Flickr.Constants.ID]!,
+                            Photo.Keys.Path : photo[Flickr.Constants.URL]! ,
                         ]
                         
                         let pic = Photo(dictionary: dictionary, context: self.sharedContext)
@@ -130,10 +132,12 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     }
     
     func configureCell(cell: PhotoAlbumViewCell , photo: Photo){
-
+        
         if photo.pinImage != nil {
             cell.imageView!.image = photo.pinImage
         } else {
+            cell.downloading.hidden = false
+            cell.downloading.startAnimating()
             let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
                 if let error = error {
                     println("Photo download error: \(error)")
@@ -142,13 +146,17 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                 if let data = data {
                     let image = UIImage(data: data)
                     photo.pinImage = image
+                    
                     dispatch_async(dispatch_get_main_queue()) {
+                        cell.downloading.hidden = true
+                        cell.downloading.stopAnimating()
                         cell.imageView!.image = image
                     }
                 }
                 
             }
         }
+        
     }
     
     var recordedChanges = [ (NSFetchedResultsChangeType,NSIndexPath)]()

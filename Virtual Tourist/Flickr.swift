@@ -40,6 +40,8 @@ class Flickr : NSObject {
         static let LAT_MAX = 90.0
         static let LON_MIN = -180.0
         static let LON_MAX = 180.0
+        static let ID = "id"
+        static let URL = "url_m"
     }
     
     func taskForSearch(methodArguments : [String: AnyObject] , completionHandler : (data:

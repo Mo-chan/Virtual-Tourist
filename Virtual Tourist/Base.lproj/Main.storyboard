@@ -79,10 +79,14 @@
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b4J-kM-QMF">
                                                     <rect key="frame" x="0.0" y="0.0" width="97" height="93"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="50f-YR-iEx">
+                                                    <rect key="frame" x="38" y="37" width="20" height="20"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <connections>
+                                            <outlet property="downloading" destination="50f-YR-iEx" id="Wx2-QL-fGg"/>
                                             <outlet property="imageView" destination="b4J-kM-QMF" id="kee-61-HoP"/>
                                         </connections>
                                     </collectionViewCell>
