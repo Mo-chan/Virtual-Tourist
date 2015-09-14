@@ -70,7 +70,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     
      func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
-        println(sectionInfo.numberOfObjects)
+        println("data: \(sectionInfo.numberOfObjects)")
         return sectionInfo.numberOfObjects
     }
     
@@ -86,7 +86,6 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     
      func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath:NSIndexPath)
     {
-        
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
@@ -96,7 +95,15 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     @IBAction func newCollection(sender: AnyObject) {
         
         newCollectionButton.enabled = false
-        sharedContext.deletedObjects
+        
+        if let photos = self.fetchedResultsController.fetchedObjects as? [Photo] {
+            println(photos.count)
+            for photo in photos {
+                self.sharedContext.deleteObject(photo)
+                CoreDataStackManager.sharedInstance().saveContext()
+            }
+        }
+        
         Flickr.sharedInstance().flickrSearch(self.latitude, longitude: self.longitude){ (success, Photos ,errorString) in
             if success {
                 if let Photos = Photos {
@@ -123,13 +130,10 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     }
     
     func configureCell(cell: PhotoAlbumViewCell , photo: Photo){
-        var pinImage = UIImage(named: "posterPlaceHoldr")
-        
+
         if photo.pinImage != nil {
-           pinImage = photo.pinImage
-        
+            cell.imageView!.image = photo.pinImage
         } else {
-            
             let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
                 if let error = error {
                     println("Photo download error: \(error)")
@@ -138,17 +142,56 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                 if let data = data {
                     let image = UIImage(data: data)
                     photo.pinImage = image
-
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.imageView!.image = image
                     }
                 }
                 
             }
-        
         }
-        
-        cell.imageView?.image = pinImage
     }
+    
+    var recordedChanges = [ (NSFetchedResultsChangeType,NSIndexPath)]()
+    
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        recordedChanges = []
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        switch type {
+        case .Insert:
+            recordedChanges.append((.Insert,newIndexPath!))
+        case .Delete:
+            recordedChanges.append((.Delete,indexPath!))
+        default:
+            return
+        }
+    }
+
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        
+        photoCollectionView.performBatchUpdates({
+            for (type,index) in self.recordedChanges {
+                switch type {
+                case .Insert:
+                    self.photoCollectionView.insertItemsAtIndexPaths([index])
+                case .Delete:
+                    self.photoCollectionView.deleteItemsAtIndexPaths([index])
+                default:
+                    continue
+                }
+            }
+            }, completion: {done in
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.newCollectionButton.enabled = true
+                })
+        })
+    }
+    
+    
+    
     
 }

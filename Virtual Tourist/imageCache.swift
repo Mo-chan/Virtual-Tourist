@@ -57,6 +57,7 @@ class imageCache {
         data.writeToFile(path, atomically: true)
     }
     
+    
     // MARK: - Helper
     
     func pathForIdentifier(identifier: String) -> String {

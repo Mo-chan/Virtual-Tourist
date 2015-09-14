@@ -20,8 +20,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
         super.viewDidLoad()
         
         mapView.delegate = self
-        mapView.showsUserLocation = true
-        
         
         fetchedResultsController.performFetch(nil)
         fetchedResultsController.delegate = self
@@ -29,14 +27,16 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
         pressRecognizer = UILongPressGestureRecognizer(target: self, action: "addPinToMap:")
         pressRecognizer?.numberOfTapsRequired = 1
 
-        
+        println(NSUserDefaults.standardUserDefaults().doubleForKey("latitude"))
         let lat = NSUserDefaults.standardUserDefaults().doubleForKey("latitude")
         let long = NSUserDefaults.standardUserDefaults().doubleForKey("longitude")
         let latD = NSUserDefaults.standardUserDefaults().doubleForKey("latitudeDelta")
         let longD = NSUserDefaults.standardUserDefaults().doubleForKey("longitudeDelta")
         let coor = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: lat, longitude: long), span: MKCoordinateSpan(latitudeDelta: latD, longitudeDelta: longD))
-        
-        mapView.setRegion(coor, animated: true)
+        if(lat != 0.0)
+        {
+            mapView.setRegion(coor, animated: true)
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -122,7 +122,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
         
         for pin in pins {
             if pin.latitude == view.annotation.coordinate.latitude && pin.longitude == view.annotation.coordinate.longitude {
-                println(pin)
                 let controller = storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbum") as! PhotoAlbumViewController
                 controller.pin = pin
                 controller.latitude = pin.latitude

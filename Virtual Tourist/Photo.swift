@@ -34,7 +34,6 @@ class Photo : NSManagedObject {
         
         path = dictionary[Keys.Path] as! String
         id = dictionary[Keys.Id] as! String
-        //pin = dictionary[Keys.Location] as? Pin
     }
 
     var pinImage: UIImage? {
