@@ -87,8 +87,10 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
      func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath:NSIndexPath)
     {
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        var manager = NSFileManager.defaultManager()
+        let filePath = Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)
+        manager.removeItemAtPath(filePath, error: nil)
         sharedContext.deleteObject(photo)
-        photo.pinImage = nil
         CoreDataStackManager.sharedInstance().saveContext()
         
     }
@@ -133,13 +135,13 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     
     func configureCell(cell: PhotoAlbumViewCell , photo: Photo){
         
-        if photo.pinImage != nil {
-            cell.imageView!.image = photo.pinImage
+        if let image = NSKeyedUnarchiver.unarchiveObjectWithFile(Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)) as? UIImage {
+            cell.downloading.hidden = true
+            cell.downloading.stopAnimating()
+            cell.imageView!.image = image
         } else {
             cell.downloading.hidden = false
             cell.downloading.startAnimating()
-            
-            //println(NSKeyedUnarchiver.unarchiveObjectWithFile(photo.path))
             
             let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
                 if let error = error {
@@ -148,7 +150,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                 if let data = data {
                     let image = UIImage(data: data)
                     photo.pinImage = image
-
+                    NSKeyedArchiver.archiveRootObject(image!,toFile: Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent))
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.downloading.hidden = true
                         cell.downloading.stopAnimating()
