@@ -138,15 +138,17 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
         } else {
             cell.downloading.hidden = false
             cell.downloading.startAnimating()
+            
+            //println(NSKeyedUnarchiver.unarchiveObjectWithFile(photo.path))
+            
             let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
                 if let error = error {
                     println("Photo download error: \(error)")
                 }
-                
                 if let data = data {
                     let image = UIImage(data: data)
                     photo.pinImage = image
-                    
+
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.downloading.hidden = true
                         cell.downloading.stopAnimating()
@@ -155,6 +157,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                 }
                 
             }
+            
         }
         
     }
