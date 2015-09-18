@@ -20,7 +20,8 @@ extension Flickr {
             "safe_search": Constants.SAFE_SEARCH,
             "extras": Constants.EXTRAS,
             "format": Constants.DATA_FORMAT,
-            "nojsoncallback": Constants.NO_JSON_CALLBACK
+            "nojsoncallback": Constants.NO_JSON_CALLBACK,
+            "per_page" : Constants.Per_Page
         ]
         
         getPage(methodArguments) { (success, PageNum , errorString) in

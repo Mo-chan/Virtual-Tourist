@@ -42,6 +42,7 @@ class Flickr : NSObject {
         static let LON_MAX = 180.0
         static let ID = "id"
         static let URL = "url_m"
+        static let Per_Page = "20"
     }
     
     func taskForSearch(methodArguments : [String: AnyObject] , completionHandler : (data:

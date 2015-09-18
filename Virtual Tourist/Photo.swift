@@ -39,11 +39,17 @@ class Photo : NSManagedObject {
     var pinImage: UIImage? {
         
         get {
-            return Flickr.Caches.imagecache.imageWithIdentifier(path)
+                return Flickr.Caches.imagecache.imageWithIdentifier(path)
         }
         
         set {
-            Flickr.Caches.imagecache.storeImage(newValue, withIdentifier: path)
+            self.sharedContext.performBlockAndWait({
+                Flickr.Caches.imagecache.storeImage(newValue, withIdentifier: self.path)
+            })
         }
+    }
+    
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
 }

@@ -86,28 +86,29 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     
      func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath:NSIndexPath)
     {
-        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-        var manager = NSFileManager.defaultManager()
-        let filePath = Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)
-        manager.removeItemAtPath(filePath, error: nil)
-        sharedContext.deleteObject(photo)
-        CoreDataStackManager.sharedInstance().saveContext()
+        self.sharedContext.performBlockAndWait({
+            let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+            var manager = NSFileManager.defaultManager()
+            let filePath = Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)
+            manager.removeItemAtPath(filePath, error: nil)
+            self.sharedContext.deleteObject(photo)
+            CoreDataStackManager.sharedInstance().saveContext()
+        })
         
     }
     
     @IBAction func newCollection(sender: AnyObject) {
         
         newCollectionButton.enabled = false
-        
-        if let photos = self.fetchedResultsController.fetchedObjects as? [Photo] {
-            println(photos.count)
-            for photo in photos {
-                self.sharedContext.deleteObject(photo)
-                photo.pinImage = nil
-                CoreDataStackManager.sharedInstance().saveContext()
+        self.sharedContext.performBlockAndWait({
+            if let photos = self.fetchedResultsController.fetchedObjects as? [Photo] {
+                for photo in photos {
+                    self.sharedContext.deleteObject(photo)
+                    photo.pinImage = nil
+                    CoreDataStackManager.sharedInstance().saveContext()
+                }
             }
-        }
-        
+        })
         Flickr.sharedInstance().flickrSearch(self.latitude, longitude: self.longitude){ (success, Photos ,errorString) in
             if success {
                 if let Photos = Photos {
@@ -117,11 +118,12 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                             Photo.Keys.Id : photo[Flickr.Constants.ID]!,
                             Photo.Keys.Path : photo[Flickr.Constants.URL]! ,
                         ]
-                        
-                        let pic = Photo(dictionary: dictionary, context: self.sharedContext)
-                        pic.pin = self.pin
-                        
-                        CoreDataStackManager.sharedInstance().saveContext()
+                        self.sharedContext.performBlockAndWait({
+                            let pic = Photo(dictionary: dictionary, context: self.sharedContext)
+                            pic.pin = self.pin
+                            
+                            CoreDataStackManager.sharedInstance().saveContext()
+                        })
                     }
                     self.newCollectionButton.enabled = true
                     self.photoCollectionView?.reloadData()
@@ -135,32 +137,34 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     
     func configureCell(cell: PhotoAlbumViewCell , photo: Photo){
         
-        if let image = NSKeyedUnarchiver.unarchiveObjectWithFile(Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)) as? UIImage {
-            cell.downloading.hidden = true
-            cell.downloading.stopAnimating()
-            cell.imageView!.image = image
-        } else {
-            cell.downloading.hidden = false
-            cell.downloading.startAnimating()
-            
-            let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
-                if let error = error {
-                    println("Photo download error: \(error)")
-                }
-                if let data = data {
-                    let image = UIImage(data: data)
-                    photo.pinImage = image
-                    NSKeyedArchiver.archiveRootObject(image!,toFile: Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent))
-                    dispatch_async(dispatch_get_main_queue()) {
-                        cell.downloading.hidden = true
-                        cell.downloading.stopAnimating()
-                        cell.imageView!.image = image
+        self.sharedContext.performBlockAndWait({
+            if let image = NSKeyedUnarchiver.unarchiveObjectWithFile(Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)) as? UIImage {
+                cell.downloading.hidden = true
+                cell.downloading.stopAnimating()
+                cell.imageView!.image = image
+            } else {
+                cell.downloading.hidden = false
+                cell.downloading.startAnimating()
+                
+                let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
+                    if let error = error {
+                        println("Photo download error: \(error)")
+                    }
+                    if let data = data {
+                        let image = UIImage(data: data)
+                        photo.pinImage = image
+                        self.sharedContext.performBlockAndWait({
+                        NSKeyedArchiver.archiveRootObject(image!,toFile: Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent))
+                            })
+                        dispatch_async(dispatch_get_main_queue()) {
+                            cell.downloading.hidden = true
+                            cell.downloading.stopAnimating()
+                            cell.imageView!.image = image
+                        }
                     }
                 }
-                
             }
-            
-        }
+        })
         
     }
     
