@@ -50,6 +50,6 @@ class Photo : NSManagedObject {
     }
     
     var sharedContext: NSManagedObjectContext {
-        return CoreDataStackManager.sharedInstance().managedObjectContext!
+        return CoreDataStackManager.sharedInstance().managedObjectContext
     }
 }

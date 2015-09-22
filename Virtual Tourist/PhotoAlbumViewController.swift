@@ -29,8 +29,9 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
         
         photoCollectionView.delegate = self
         photoCollectionView.dataSource = self
-        
-        fetchedResultsController.performFetch(nil)
+        do {
+            try fetchedResultsController.performFetch()
+        } catch{ }
         fetchedResultsController.delegate = self
 
         let coor = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1))
@@ -38,7 +39,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
         mapView.setRegion(coor, animated: true)
         
         let geoLoc = CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude)
-        var annotation = MKPointAnnotation()
+        let annotation = MKPointAnnotation()
         annotation.coordinate = geoLoc
         mapView.addAnnotation(annotation)
        
@@ -49,7 +50,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     }
     
     var sharedContext: NSManagedObjectContext {
-        return CoreDataStackManager.sharedInstance().managedObjectContext!
+        return CoreDataStackManager.sharedInstance().managedObjectContext
     }
     
     lazy var fetchedResultsController: NSFetchedResultsController = {
@@ -69,8 +70,8 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
         }()
     
      func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionInfo = fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
-        println("data: \(sectionInfo.numberOfObjects)")
+        let sectionInfo = fetchedResultsController.sections![section] 
+        print("data: \(sectionInfo.numberOfObjects)")
         return sectionInfo.numberOfObjects
     }
     
@@ -88,9 +89,11 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     {
         self.sharedContext.performBlockAndWait({
             let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-            var manager = NSFileManager.defaultManager()
-            let filePath = Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)
-            manager.removeItemAtPath(filePath, error: nil)
+            let manager = NSFileManager.defaultManager()
+            let filePath = Flickr.Caches.imagecache.pathForIdentifier(photo.path)
+            do {
+            try manager.removeItemAtPath(filePath)
+            } catch { }
             self.sharedContext.deleteObject(photo)
             CoreDataStackManager.sharedInstance().saveContext()
         })
@@ -138,7 +141,7 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
     func configureCell(cell: PhotoAlbumViewCell , photo: Photo){
         
         self.sharedContext.performBlockAndWait({
-            if let image = NSKeyedUnarchiver.unarchiveObjectWithFile(Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent)) as? UIImage {
+            if let image = NSKeyedUnarchiver.unarchiveObjectWithFile(Flickr.Caches.imagecache.pathForIdentifier(photo.path)) as? UIImage {
                 cell.downloading.hidden = true
                 cell.downloading.stopAnimating()
                 cell.imageView!.image = image
@@ -146,15 +149,15 @@ class PhotoAlbumViewController : UIViewController, UICollectionViewDelegate,  MK
                 cell.downloading.hidden = false
                 cell.downloading.startAnimating()
                 
-                let task = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
+                _ = Flickr.sharedInstance().taskForImage(photo.path){ data, error in
                     if let error = error {
-                        println("Photo download error: \(error)")
+                        print("Photo download error: \(error)")
                     }
                     if let data = data {
                         let image = UIImage(data: data)
                         photo.pinImage = image
                         self.sharedContext.performBlockAndWait({
-                        NSKeyedArchiver.archiveRootObject(image!,toFile: Flickr.Caches.imagecache.pathForIdentifier(photo.path.lastPathComponent))
+                        NSKeyedArchiver.archiveRootObject(image!,toFile: Flickr.Caches.imagecache.pathForIdentifier(photo.path))
                             })
                         dispatch_async(dispatch_get_main_queue()) {
                             cell.downloading.hidden = true
