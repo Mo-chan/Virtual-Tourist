@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -26,8 +26,8 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="yO9-k4-kNP" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-16" id="9j2-g5-i7s"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="yO9-k4-kNP" secondAttribute="trailing" constant="-16" id="E0K-C7-Rqf"/>
+                            <constraint firstItem="yO9-k4-kNP" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-20" id="9j2-g5-i7s"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="yO9-k4-kNP" secondAttribute="trailing" constant="-20" id="E0K-C7-Rqf"/>
                             <constraint firstItem="yO9-k4-kNP" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="8" id="Vl2-RC-sM5"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="yO9-k4-kNP" secondAttribute="bottom" id="txQ-bx-9Pg"/>
                         </constraints>
@@ -70,21 +70,29 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="imageCell" id="yOk-yI-wLq" customClass="PhotoAlbumViewCell" customModule="Virtual_Tourist" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="97" height="93"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="97" height="93"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b4J-kM-QMF">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="b4J-kM-QMF">
                                                     <rect key="frame" x="0.0" y="0.0" width="97" height="93"/>
                                                 </imageView>
-                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="50f-YR-iEx">
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="50f-YR-iEx">
                                                     <rect key="frame" x="38" y="37" width="20" height="20"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <constraints>
+                                            <constraint firstItem="b4J-kM-QMF" firstAttribute="centerX" secondItem="50f-YR-iEx" secondAttribute="centerX" id="2A3-PS-GHn"/>
+                                            <constraint firstAttribute="bottom" secondItem="b4J-kM-QMF" secondAttribute="bottom" id="Xjp-wq-ejC"/>
+                                            <constraint firstItem="b4J-kM-QMF" firstAttribute="centerY" secondItem="50f-YR-iEx" secondAttribute="centerY" id="YUA-iE-NnJ"/>
+                                            <constraint firstItem="b4J-kM-QMF" firstAttribute="top" secondItem="yOk-yI-wLq" secondAttribute="top" id="ZUh-Uf-5L6"/>
+                                            <constraint firstAttribute="trailing" secondItem="b4J-kM-QMF" secondAttribute="trailing" id="cEp-xT-Esk"/>
+                                            <constraint firstItem="b4J-kM-QMF" firstAttribute="leading" secondItem="yOk-yI-wLq" secondAttribute="leading" id="lCz-uX-lnL"/>
+                                        </constraints>
                                         <connections>
                                             <outlet property="downloading" destination="50f-YR-iEx" id="Wx2-QL-fGg"/>
                                             <outlet property="imageView" destination="b4J-kM-QMF" id="kee-61-HoP"/>
@@ -109,18 +117,18 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="wJc-Lt-XWv" firstAttribute="leading" secondItem="iXN-qY-sA6" secondAttribute="leadingMargin" constant="-16" id="1wH-MS-pXT"/>
+                            <constraint firstItem="wJc-Lt-XWv" firstAttribute="leading" secondItem="iXN-qY-sA6" secondAttribute="leadingMargin" constant="-20" id="1wH-MS-pXT"/>
+                            <constraint firstItem="O50-uw-Byp" firstAttribute="leading" secondItem="WKr-Jn-JfH" secondAttribute="leading" id="2gn-3n-78J"/>
                             <constraint firstItem="WKr-Jn-JfH" firstAttribute="top" secondItem="wJc-Lt-XWv" secondAttribute="bottom" id="5M7-It-Yot"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="wJc-Lt-XWv" secondAttribute="trailing" constant="-16" id="73k-52-U5m"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="WKr-Jn-JfH" secondAttribute="trailing" constant="-16" id="7S0-kI-1de"/>
-                            <constraint firstItem="O50-uw-Byp" firstAttribute="leading" secondItem="iXN-qY-sA6" secondAttribute="leadingMargin" constant="-16" id="UFJ-T0-q56"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="wJc-Lt-XWv" secondAttribute="trailing" constant="-20" id="73k-52-U5m"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="WKr-Jn-JfH" secondAttribute="trailing" constant="-20" id="7S0-kI-1de"/>
+                            <constraint firstItem="O50-uw-Byp" firstAttribute="trailing" secondItem="WKr-Jn-JfH" secondAttribute="trailing" id="WeX-cl-QWJ"/>
                             <constraint firstItem="ML2-L5-kia" firstAttribute="top" secondItem="WKr-Jn-JfH" secondAttribute="bottom" id="WyF-vG-OlO"/>
                             <constraint firstItem="wJc-Lt-XWv" firstAttribute="top" secondItem="pec-yg-3OS" secondAttribute="bottom" constant="8" id="Y0Q-aN-Aak"/>
                             <constraint firstItem="ML2-L5-kia" firstAttribute="top" secondItem="wJc-Lt-XWv" secondAttribute="bottom" constant="400" id="ZoV-Kh-lpn"/>
                             <constraint firstItem="O50-uw-Byp" firstAttribute="top" secondItem="wJc-Lt-XWv" secondAttribute="bottom" constant="370" id="ZrY-vi-K39"/>
                             <constraint firstItem="ML2-L5-kia" firstAttribute="top" secondItem="O50-uw-Byp" secondAttribute="bottom" id="aQL-gr-vJw"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="O50-uw-Byp" secondAttribute="trailing" constant="-16" id="tbj-pY-Ixh"/>
-                            <constraint firstItem="WKr-Jn-JfH" firstAttribute="leading" secondItem="iXN-qY-sA6" secondAttribute="leadingMargin" constant="-16" id="tsU-gY-IQF"/>
+                            <constraint firstItem="WKr-Jn-JfH" firstAttribute="leading" secondItem="iXN-qY-sA6" secondAttribute="leadingMargin" constant="-20" id="tsU-gY-IQF"/>
                         </constraints>
                     </view>
                     <connections>

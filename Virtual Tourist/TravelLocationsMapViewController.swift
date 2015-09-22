@@ -11,30 +11,26 @@ import MapKit
 import CoreData
 
 class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
-
+    
     @IBOutlet weak var mapView: MKMapView!
     var pressRecognizer: UILongPressGestureRecognizer? = nil
     var pins : [Pin]!
     var PinToBeAdded : Pin!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         mapView.delegate = self
-        
-        fetchedResultsController.performFetch(nil)
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {}
         fetchedResultsController.delegate = self
-        
         pressRecognizer = UILongPressGestureRecognizer(target: self, action: "addPinToMap:")
-
-        println(NSUserDefaults.standardUserDefaults().doubleForKey("latitude"))
         let lat = NSUserDefaults.standardUserDefaults().doubleForKey("latitude")
         let long = NSUserDefaults.standardUserDefaults().doubleForKey("longitude")
         let latD = NSUserDefaults.standardUserDefaults().doubleForKey("latitudeDelta")
         let longD = NSUserDefaults.standardUserDefaults().doubleForKey("longitudeDelta")
         let coor = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: lat, longitude: long), span: MKCoordinateSpan(latitudeDelta: latD, longitudeDelta: longD))
-        if(lat != 0.0)
-        {
+        if(lat != 0.0){
             mapView.setRegion(coor, animated: true)
         }
     }
@@ -49,7 +45,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
         view.removeGestureRecognizer(pressRecognizer!)
     }
     
-    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         NSUserDefaults.standardUserDefaults().setDouble(self.mapView.region.center.latitude, forKey: "latitude")
         NSUserDefaults.standardUserDefaults().setDouble(self.mapView.region.center.longitude, forKey: "longitude")
         NSUserDefaults.standardUserDefaults().setDouble(self.mapView.region.span.latitudeDelta, forKey: "latitudeDelta")
@@ -57,78 +53,64 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
     }
     
     var sharedContext: NSManagedObjectContext {
-        return CoreDataStackManager.sharedInstance().managedObjectContext! 
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+        
     }
     
     lazy var fetchedResultsController: NSFetchedResultsController = {
-        
-        
-        var error : NSError?
+    
         let fetchRequest = NSFetchRequest(entityName: "Pin")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "latitude", ascending: true)]
         self.sharedContext.performBlockAndWait({
-        let results = self.sharedContext.executeFetchRequest(fetchRequest, error: &error)
-            
-        if error != nil {
-            println("could not fetch tourist locations: \(error?.localizedDescription)")
-        } else {
-            var annotations = [MKPointAnnotation]()
-            let pin = results as! [Pin]
-            self.pins = pin
-            for dictionary in pin {
-                let lat = CLLocationDegrees(dictionary.latitude as Double)
-                let long = CLLocationDegrees(dictionary.longitude as Double)
-                let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
+            do {
+                let results = try self.sharedContext.executeFetchRequest(fetchRequest)
+                var annotations = [MKPointAnnotation]()
+                let pin = results as! [Pin]
+                self.pins = pin
                 
+                for dictionary in pin {
+                    let lat = CLLocationDegrees(dictionary.latitude as Double)
+                    let long = CLLocationDegrees(dictionary.longitude as Double)
+                    let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                    var annotation = MKPointAnnotation()
+                    annotation.coordinate = coordinate
+                    annotations.append(annotation)
+                }
                 
-                var annotation = MKPointAnnotation()
-                annotation.coordinate = coordinate
-                
-                annotations.append(annotation)
-            
+                self.mapView.addAnnotations(annotations)
+            } catch {
+                 print("could not fetch tourist locations: \(error)")
             }
-            self.mapView.addAnnotations(annotations)
-        }
+        
         })
-        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
-            managedObjectContext: self.sharedContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         return fetchedResultsController
-        
-        
-        }()
-
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
-        
+    }()
+    
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+    
         let reuseId = "pin"
-        
         var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
-        
         if pinView == nil {
+            
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.enabled = true
             pinView!.draggable = true
             pinView!.pinColor = .Red
-        }
-        else {
+        } else {
             pinView!.annotation = annotation
         }
-        
         return pinView
     }
     
-
-    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         self.sharedContext.performBlockAndWait({
             for pin in self.pins {
-                if pin.latitude == view.annotation.coordinate.latitude && pin.longitude == view.annotation.coordinate.longitude {
+                if pin.latitude == view.annotation!.coordinate.latitude && pin.longitude == view.annotation!.coordinate.longitude {
                     let controller = self.storyboard!.instantiateViewControllerWithIdentifier("PhotoAlbum") as! PhotoAlbumViewController
                     controller.pin = pin
                     controller.latitude = pin.latitude
                     controller.longitude = pin.longitude
-                    
                     let nav = UINavigationController()
                     nav.pushViewController(controller, animated: false)
                     self.mapView.deselectAnnotation(view.annotation!, animated: true)
@@ -139,18 +121,15 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
             }
         })
     }
-
     
-    func addPinToMap(gestureRecognizer: UIGestureRecognizer)
-    {
+    func addPinToMap(gestureRecognizer: UIGestureRecognizer) {
+    
         if (gestureRecognizer.state) != UIGestureRecognizerState.Ended {
             return
-        }
-        else {
+        } else {
             let touchpoint = gestureRecognizer.locationInView(mapView)
             let touchCoordinate = mapView.convertPoint(touchpoint, toCoordinateFromView: mapView)
             let geoLoc = CLLocationCoordinate2D(latitude: touchCoordinate.latitude, longitude: touchCoordinate.longitude)
-            
             let dictionary: [String : AnyObject] = [
                 Pin.Keys.Latitude : touchCoordinate.latitude,
                 Pin.Keys.Longitude : touchCoordinate.longitude,
@@ -160,7 +139,7 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
                 CoreDataStackManager.sharedInstance().saveContext()
                 self.pins.append(self.PinToBeAdded)
             })
-            var annotation = MKPointAnnotation()
+            let annotation = MKPointAnnotation()
             annotation.coordinate = geoLoc
             mapView.addAnnotation(annotation)
             
@@ -168,7 +147,6 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
                 if success {
                     if let Photos = Photos {
                         for photo in Photos {
-                        
                             let dictionary: [String : AnyObject] = [
                                 Photo.Keys.Id : photo[Flickr.Constants.ID]!,
                                 Photo.Keys.Path : photo[Flickr.Constants.URL]! ,
@@ -176,14 +154,12 @@ class TravelLocationsMapViewController: UIViewController, MKMapViewDelegate, NSF
                             self.sharedContext.performBlockAndWait({
                                 let pic = Photo(dictionary: dictionary, context: self.sharedContext)
                                 pic.pin = self.PinToBeAdded
-                                
                                 CoreDataStackManager.sharedInstance().saveContext()
                             })
                         }
+                    } else {
                     
                     }
-                } else {
-                    
                 }
             }
         }

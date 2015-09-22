@@ -46,9 +46,9 @@ extension Flickr {
     
     func getPage(methodArguments : [String: AnyObject], completionHandler: (success: Bool, PageNum: Int? ,errorString: String?) -> Void) {
         
-        let task = taskForSearch(methodArguments) { JSONResult, error in
+        _ = taskForSearch(methodArguments) { JSONResult, error in
         
-            if let error = error {
+            if let _ = error {
                 completionHandler(success: false, PageNum: nil , errorString: "Network Error")
             } else {
                 
@@ -67,9 +67,9 @@ extension Flickr {
     
     func getPhotos (methodArguments : [String: AnyObject], completionHandler: (success: Bool, Photos: [[String: AnyObject]]? ,errorString: String?) -> Void) {
         
-        let task = taskForSearch(methodArguments) { JSONResult, error in
+        _ = taskForSearch(methodArguments) { JSONResult, error in
             
-            if let error = error {
+            if let _ = error {
                 completionHandler(success: false, Photos: nil , errorString: "Network Error")
             } else {
                 

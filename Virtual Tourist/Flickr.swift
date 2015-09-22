@@ -54,16 +54,17 @@ class Flickr : NSObject {
         
             let task = session.dataTaskWithRequest(request) {data, response, downloadError in
                 if let error = downloadError {
-                    println("Could not complete the request \(error)")
+                    print("Could not complete the request \(error)")
                 } else {
-                    var parsingError: NSError? = nil
-                    let parsedResult = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: &parsingError) as! NSDictionary
-                    if let photosDictionary = parsedResult.valueForKey("photos") as? [String:AnyObject] {
-                        
-                        completionHandler(data: photosDictionary, errorString: nil)
-                    } else {
-                        println("Cant find key 'photos' in \(parsedResult)")
-                    }
+                    do {
+                        let parsedResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.AllowFragments) as! NSDictionary
+                        if let photosDictionary = parsedResult.valueForKey("photos") as? [String:AnyObject] {
+                            
+                            completionHandler(data: photosDictionary, errorString: nil)
+                        } else {
+                            print("Cant find key 'photos' in \(parsedResult)")
+                        }
+                    } catch {}
                 }
                
             }
@@ -79,7 +80,7 @@ class Flickr : NSObject {
             
             let task = session.dataTaskWithRequest(request) {data, response, downloadError in
                 if let error = downloadError {
-                    println("Could not complete the request \(error)")
+                    print("Could not complete the request \(error)")
                 } else {
                     completionHandler(data: data, errorString: nil)
                 }
@@ -106,7 +107,7 @@ class Flickr : NSObject {
             
         }
         
-        return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
+        return (!urlVars.isEmpty ? "?" : "") +  urlVars.joinWithSeparator("&")
     }
     
     func createBoundingBoxString(latitude: Double, longitude: Double) -> String {
